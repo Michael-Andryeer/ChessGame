@@ -11,6 +11,19 @@ namespace ChessLogic
         // Esta propriedade é apenas para leitura (somente get)
         public override Player Color { get; }
 
+        // Define um array de direções possíveis para o movimento da Rainha
+        private static readonly Direction[] dirs = new Direction[]
+        {
+            Direction.North,        // Movimento na direção norte
+            Direction.South,        // Movimento na direção sul
+            Direction.East,         // Movimento na direção leste
+            Direction.West,         // Movimento na direção oeste
+            Direction.NorthEast,    // Movimento na direção nordeste
+            Direction.NorthWest,    // Movimento na direção noroeste
+            Direction.SouthEast,    // Movimento na direção sudeste
+            Direction.SouthWest     // Movimento na direção sudoeste
+        };
+
         // Construtor da classe Queen que inicializa a propriedade Color
         // Parâmetro: color - a cor do jogador (branco ou preto)
         public Queen(Player color)
@@ -30,6 +43,18 @@ namespace ChessLogic
 
             // Retorna a cópia da peça
             return copy;
+        }
+
+        // Sobrescreve o método GetMoves da classe base para obter todos os movimentos possíveis para a Rainha a partir de uma posição específica
+        // Parâmetros:
+        // from - a posição atual da Rainha
+        // board - o tabuleiro atual do jogo
+        // Retorna: uma coleção de movimentos possíveis
+        public override IEnumerable<Move> GetMoves(Position from, Board board)
+        {
+            // Usa o método MovePositionsInDirs para obter todas as posições possíveis para a Rainha nas direções definidas
+            // Transforma essas posições em movimentos normais (NormalMove)
+            return MovePositionsInDirs(from, board, dirs).Select(to => new NormalMove(from, to));
         }
     }
 }

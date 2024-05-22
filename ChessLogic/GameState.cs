@@ -4,6 +4,7 @@ namespace ChessLogic
     // Define uma classe chamada GameState que representa o estado atual de um jogo de xadrez.
     public class GameState
     {
+        // Campos privados que representam o jogador branco e o tabuleiro de xadrez.
         private Player white;
         private Board board;
 
@@ -23,11 +24,38 @@ namespace ChessLogic
             CurrentPlayer = player;
         }
 
-
-
-        public GameState(Player white, Board board) : this(board,white)
+        // Método que retorna os movimentos legais para uma peça em uma determinada posição.
+        public IEnumerable<Move> LegalMovesForPiece(Position pos)
         {
-            
+            // Verifica se a posição está vazia ou se a peça na posição pertence ao jogador atual.
+            if (Board.IsEmpty(pos) || Board[pos].Color != CurrentPlayer)
+            {
+                return Enumerable.Empty<Move>(); // Retorna uma lista vazia de movimentos.
+            }
+
+            // Obtém a peça na posição especificada.
+            Piece piece = Board[pos];
+
+            // Retorna os movimentos possíveis para a peça na posição especificada.
+            return piece.GetMoves(pos, Board);
+        }
+
+        // Método que executa um movimento e altera o jogador atual para o próximo.
+        public void MakeMove(Move move)
+        {
+            // Executa o movimento no tabuleiro.
+            move.Execute(Board);
+
+            // Altera o jogador atual para o próximo jogador.
+            CurrentPlayer = CurrentPlayer.Opponent();
+        }
+
+        // Construtor alternativo da classe GameState que inicializa o jogador branco e o tabuleiro de xadrez.
+        // Este construtor chama o outro construtor passando o tabuleiro e o jogador branco.
+        public GameState(Player white, Board board) : this(board, white)
+        {
+            // Inicializa o campo privado 'white' com o jogador branco fornecido.
+            this.white = white;
         }
     }
 }

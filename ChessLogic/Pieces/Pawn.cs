@@ -1,5 +1,6 @@
-﻿
-// Define o namespace ChessLogic, que contém todas as classes relacionadas à lógica do jogo de xadrez
+﻿// Define o namespace ChessLogic, que contém todas as classes relacionadas à lógica do jogo de xadrez
+using System.Security.Cryptography.X509Certificates;
+
 namespace ChessLogic
 {
     // Define a classe Pawn que herda da classe base Piece
@@ -12,11 +13,24 @@ namespace ChessLogic
         // Esta propriedade é apenas para leitura (somente get)
         public override Player Color { get; }
 
+        // Define a direção em que o peão avança com base na cor do jogador
+        private readonly Direction forward;
+
         // Construtor da classe Pawn que inicializa a propriedade Color
         // Parâmetro: color - a cor do jogador (branco ou preto)
         public Pawn(Player color)
         {
             Color = color;  // Inicializa a propriedade Color com o valor fornecido
+
+            // Define a direção em que o peão avança com base na cor do jogador
+            if (color == Player.White)
+            {
+                forward = Direction.North;
+            }
+            else if (color == Player.Black)
+            {
+                forward = Direction.South;
+            }
         }
 
         // Sobrescreve o método Copy da classe base para criar uma cópia da peça Pawn
@@ -31,6 +45,62 @@ namespace ChessLogic
 
             // Retorna a cópia da peça
             return copy;
+        }
+
+        // Verifica se uma posição é válida para o movimento de um peão
+        private static bool CanMoveTo(Position pos, Board board)
+        {
+            return Board.IsInside(pos) && board.IsEmpty(pos);
+        }
+
+        // Verifica se uma posição pode ser capturada por um peão
+        private bool CanCaptureAt(Position pos, Board board)
+        {
+            if (!Board.IsInside(pos) || board.IsEmpty(pos))
+            {
+                return false;
+            }
+
+            return board[pos].Color != Color;
+        }
+
+        // Obtém todos os movimentos possíveis para um peão na direção de avanço
+        private IEnumerable<Move> ForwardMoves(Position from, Board board)
+        {
+            Position oneMovePos = from + forward;
+
+            if (CanMoveTo(oneMovePos, board))
+            {
+                yield return new NormalMove(from, oneMovePos);
+
+                Position twoMovesPos = oneMovePos + forward;
+
+                if (!HasMoved && CanMoveTo(twoMovesPos, board))
+                {
+                    yield return new NormalMove(from, twoMovesPos);
+                }
+            }
+        }
+
+        // Obtém todos os movimentos possíveis para um peão nas diagonais
+        private IEnumerable<Move> Diagonalmoves(Position from, Board board)
+        {
+            foreach (Direction dir in new Direction[] { Direction.West, Direction.East })
+            {
+                Position to = from + forward + dir;
+
+                if (CanCaptureAt(to, board))
+                {
+                    yield return new NormalMove(from, to);
+                }
+            }
+        }
+
+        // Obtém todos os movimentos possíveis para um peão a partir de uma posição específica no tabuleiro
+        public override IEnumerable<Move> GetMoves(Position from, Board board)
+        {
+            // Retorna a concatenação dos movimentos possíveis na direção de avanço e nas diagonais
+            return ForwardMoves(from, board).Concat(Diagonalmoves(from, board));
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿// Define o namespace ChessLogic, que contém todas as classes relacionadas à lógica do jogo de xadrez
+using System.Security.Cryptography.X509Certificates;
+
 namespace ChessLogic
 {
     // Define a classe Knight que herda da classe base Piece
@@ -30,6 +32,36 @@ namespace ChessLogic
 
             // Retorna a cópia da peça
             return copy;
+        }
+
+        // Gera as posições potenciais para onde o cavalo pode se mover a partir de uma posição específica
+        private static IEnumerable<Position> PotentialToPositions(Position from)
+        {
+            // Loop através das direções vertical e horizontal para gerar todas as posições potenciais
+            foreach (Direction vDir in new Direction[] { Direction.North, Direction.South })
+            {
+                foreach (Direction hDir in new Direction[] { Direction.West, Direction.East })
+                {
+                    // Adiciona as posições potenciais para onde o cavalo pode se mover
+                    yield return from + 2 * vDir + hDir;
+                    yield return from + 2 * hDir + vDir;
+                }
+            }
+        }
+
+        // Obtém as posições válidas para onde o cavalo pode se mover a partir de uma posição específica no tabuleiro
+        private IEnumerable<Position> MovePositions(Position from, Board board)
+        {
+            // Filtra as posições potenciais para obter apenas as posições válidas
+            return PotentialToPositions(from).Where(pos => Board.IsInside(pos)
+            && (board.IsEmpty(pos) || board[pos].Color != Color));
+        }
+
+        // Obtém todos os movimentos possíveis para o cavalo a partir de uma posição específica no tabuleiro
+        public override IEnumerable<Move> GetMoves(Position from, Board board)
+        {
+            // Retorna os movimentos possíveis do cavalo como movimentos normais (NormalMove)
+            return MovePositions(from, board).Select(to => new NormalMove(from, to));
         }
     }
 }

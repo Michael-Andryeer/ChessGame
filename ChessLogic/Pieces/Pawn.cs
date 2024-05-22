@@ -1,5 +1,5 @@
 ﻿
-n// Define o namespace ChessLogic, que contém todas as classes relacionadas à lógica do jogo de xadrez
+// Define o namespace ChessLogic, que contém todas as classes relacionadas à lógica do jogo de xadrez
 namespace ChessLogic
 {
     // Define a classe Pawn que herda da classe base Piece

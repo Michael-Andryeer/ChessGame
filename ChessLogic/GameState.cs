@@ -4,6 +4,9 @@ namespace ChessLogic
     // Define uma classe chamada GameState que representa o estado atual de um jogo de xadrez.
     public class GameState
     {
+        private Player white;
+        private Board board;
+
         // Propriedade somente leitura que representa o tabuleiro de xadrez.
         public Board Board { get; }
 
@@ -18,6 +21,12 @@ namespace ChessLogic
 
             // Inicializa a propriedade CurrentPlayer com o jogador fornecido.
             CurrentPlayer = player;
+        }
+
+        public GameState(Player white, Board board)
+        {
+            this.white = white;
+            this.board = board;
         }
     }
 }

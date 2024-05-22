@@ -19,6 +19,8 @@ namespace ChessInterface
             {PieceType.Rook, LoadImage("Assets/RookW.png") },
             {PieceType.Queen, LoadImage("Assets/QueenW.png") },
             {PieceType.King, LoadImage("Assets/KingW.png") },
+            {PieceType.Bishop, LoadImage("Assets/BishopW.png") },
+
         };
 
         // Dicionário privado que mapeia cada tipo de peça (PieceType) para sua respectiva imagem para peças pretas.
@@ -30,6 +32,8 @@ namespace ChessInterface
             {PieceType.Rook, LoadImage("Assets/RookB.png") },
             {PieceType.Queen, LoadImage("Assets/QueenB.png") },
             {PieceType.King, LoadImage("Assets/KingB.png") },
+            {PieceType.Bishop, LoadImage("Assets/BishopB.png") },
+
         };
 
         // Método privado que carrega uma imagem a partir de um arquivo e retorna a imagem carregada como um ImageSource.

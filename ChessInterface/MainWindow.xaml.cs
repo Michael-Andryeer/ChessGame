@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using ChessLogic;
 
 // Define um namespace chamado ChessInterface para organizar as classes relacionadas à interface gráfica do jogo de xadrez.
@@ -21,17 +22,11 @@ namespace ChessInterface
         // Construtor da classe MainWindow que é chamado quando a janela é inicializada.
         public MainWindow()
         {
-            try
-            {
                 InitializeComponent();
                 InitializeBoard();
                 gameState = new GameState(Player.White, Board.Initial());
                 DrawBoard(gameState.Board);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ocorreu um erro: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            
         }
 
         // Método privado para inicializar o tabuleiro de xadrez na interface gráfica.
@@ -67,5 +62,7 @@ namespace ChessInterface
                 }
             }
         }
+
+       
     }
 }

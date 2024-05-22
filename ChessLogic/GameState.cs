@@ -23,10 +23,11 @@ namespace ChessLogic
             CurrentPlayer = player;
         }
 
-        public GameState(Player white, Board board)
+
+
+        public GameState(Player white, Board board) : this(board,white)
         {
-            this.white = white;
-            this.board = board;
+            
         }
     }
 }

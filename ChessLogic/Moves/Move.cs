@@ -17,13 +17,21 @@ namespace ChessLogic
         // Método abstrato que deve ser implementado nas classes derivadas para executar o movimento no tabuleiro.
         public abstract void Execute(Board board);
 
+        // Método público e virtual que verifica se um movimento é legal em um tabuleiro fornecido
         public virtual bool IsLegal(Board board)
         {
+            // Obtém o jogador (cor da peça) na posição de origem do movimento
             Player player = board[FromPos].Color;
 
+            // Cria uma cópia do tabuleiro para simular o movimento
             Board boardCopy = board.Copy();
+
+            // Executa o movimento no tabuleiro copiado
             Execute(boardCopy);
+
+            // Verifica se o jogador que fez o movimento não está em xeque após o movimento
             return !boardCopy.IsInCheck(player);
         }
+
     }
 }

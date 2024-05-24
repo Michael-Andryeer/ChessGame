@@ -52,5 +52,20 @@ namespace ChessLogic
             // Usa LINQ para chamar MovePositionsInDir para cada direção e concatenar os resultados.
             return dirs.SelectMany(dir => MovePositionsInDir(from, board, dir));
         }
+
+        // Método público e virtual que verifica se é possível capturar o rei adversário a partir de uma posição dada no tabuleiro
+        public virtual bool CanCaptureOpponentKing(Position from, Board board)
+        {
+            // Obtém todos os movimentos possíveis a partir da posição fornecida e verifica se algum desses movimentos resulta na captura do rei adversário
+            return GetMoves(from, board).Any(move => // Verifica se existe algum movimento na lista de movimentos possíveis que atenda a condição especificada no bloco de código
+            {
+                // Obtém a peça na posição de destino do movimento atual
+                Piece piece = board[move.ToPos];
+
+                // Retorna verdadeiro se a peça não for nula e se o tipo da peça for Rei
+                return piece != null && piece.Type == PieceType.King;
+            });
+        }
+
     }
 }

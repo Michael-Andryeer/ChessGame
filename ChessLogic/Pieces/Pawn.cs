@@ -102,5 +102,20 @@ namespace ChessLogic
             // Retorna a concatenação dos movimentos possíveis na direção de avanço e nas diagonais
             return ForwardMoves(from, board).Concat(Diagonalmoves(from, board));
         }
+
+        // Método público e virtual que verifica se é possível capturar o rei adversário a partir de uma posição dada no tabuleiro
+        public override bool CanCaptureOpponentKing(Position from, Board board)
+        {
+            // Obtém todos os movimentos na diagonal possíveis a partir da posição fornecida e verifica se algum desses movimentos resulta na captura do rei adversário
+            return Diagonalmoves(from, board).Any(move => // Verifica se existe algum movimento na lista de movimentos possíveis que atenda a condição especificada no bloco de código
+            {
+                // Obtém a peça na posição de destino do movimento atual
+                Piece piece = board[move.ToPos];
+
+                // Retorna verdadeiro se a peça não for nula e se o tipo da peça for Rei
+                return piece != null && piece.Type == PieceType.King;
+            });
+        }
+
     }
 }

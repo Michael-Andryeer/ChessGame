@@ -84,5 +84,68 @@ namespace ChessLogic
             // Retorna verdadeiro se a posição especificada não contiver uma peça.
             return this[pos] == null;
         }
+
+        // Método público que retorna um IEnumerable de posições ocupadas no tabuleiro
+        public IEnumerable<Position> PiecePositions()
+        {
+            // Loop externo para iterar sobre as linhas do tabuleiro (0 a 7)
+            for (int r = 0; r < 8; r++)
+            {
+                // Loop interno para iterar sobre as colunas do tabuleiro (0 a 7)
+                for (int c = 0; c < 8; c++)
+                {
+                    // Cria um objeto Position representando a posição atual no tabuleiro
+                    Position pos = new Position(r, c);
+
+                    // Verifica se a posição não está vazia (ou seja, contém uma peça)
+                    if (!IsEmpty(pos))
+                    {
+                        // Usa yield para retornar a posição atual ao chamador do método
+                        yield return pos; //  usado para retornar elementos de uma coleção um a um, sem a necessidade de criar uma coleção intermediária completa na memória. 
+                    }
+                }
+            }
+        }
+
+        // Método público que retorna um IEnumerable de posições ocupadas por peças de um jogador específico
+        public IEnumerable<Position> PiecesPositionsFor(Player player)
+        {
+            // Retorna as posições filtradas, onde a cor da peça na posição é igual à cor do jogador fornecido
+            return PiecePositions().Where(pos => this[pos].Color == player);
+        }
+
+        // Método público que verifica se um jogador está em xeque
+        public bool IsInCheck(Player player)
+        {
+            // Verifica se alguma peça do oponente pode capturar o rei do jogador especificado
+            return PiecesPositionsFor(player.Opponent()).Any(pos => // Obtém todas as posições das peças do oponente e verifica se alguma pode capturar o rei do jogador
+            {
+                // Obtém a peça na posição atual do oponente
+                Piece piece = this[pos];
+
+                // Retorna verdadeiro se a peça puder capturar o rei do jogador a partir da posição atual
+                return piece.CanCaptureOpponentKing(pos, this);
+            });
+        }
+
+        // Método público que cria uma cópia do tabuleiro
+        public Board Copy()
+        {
+            // Cria uma nova instância do objeto Board
+            Board copy = new Board();
+
+            // Itera sobre todas as posições ocupadas no tabuleiro atual
+            foreach (Position pos in PiecePositions())
+            {
+                // Copia a peça da posição atual no tabuleiro original para a mesma posição no tabuleiro copiado
+                copy[pos] = this[pos].Copy();
+            }
+
+            // Retorna a cópia do tabuleiro
+            return copy;
+        }
+
     }
 }
+
+

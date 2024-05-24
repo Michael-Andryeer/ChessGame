@@ -77,4 +77,19 @@ public class King : Piece
             yield return new NormalMove(from, to);
         }
     }
+
+    // Método público sobrescrito que verifica se é possível capturar o rei adversário a partir de uma posição dada no tabuleiro
+    public override bool CanCaptureOpponentKing(Position from, Board board)
+    {
+        // Obtém todas as posições possíveis de movimento a partir da posição fornecida e verifica se algum desses movimentos resulta na captura do rei adversário
+        return MovePositions(from, board).Any(to => // Verifica se existe alguma posição de movimento na lista de posições possíveis que atenda à condição especificada no bloco de código
+        {
+            // Obtém a peça na posição de destino do movimento atual
+            Piece piece = board[to];
+
+            // Retorna verdadeiro se a peça não for nula e se o tipo da peça for Rei
+            return piece != null && piece.Type == PieceType.King;
+        });
+    }
+
 }

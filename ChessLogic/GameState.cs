@@ -37,7 +37,8 @@ namespace ChessLogic
             Piece piece = Board[pos];
 
             // Retorna os movimentos possíveis para a peça na posição especificada.
-            return piece.GetMoves(pos, Board);
+            IEnumerable<Move> moveCandidates = piece.GetMoves(pos, Board);
+            return moveCandidates.Where(move => move.IsLegal(Board));
         }
 
         // Método que executa um movimento e altera o jogador atual para o próximo.

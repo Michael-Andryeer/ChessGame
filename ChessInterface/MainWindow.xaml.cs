@@ -40,7 +40,7 @@ namespace ChessInterface
             InitializeBoard(); // Inicializa o tabuleiro de xadrez na interface gráfica.
             gameState = new GameState(Player.White, Board.Initial()); // Inicializa o estado do jogo.
             DrawBoard(gameState.Board); // Desenha o tabuleiro na interface gráfica.
-            SetCursor(gameState.CurrentPlayer);
+            SetCursor(gameState.CurrentPlayer); // Define o cursor do mouse com base no jogador atual.
         }
 
         // Método privado para inicializar o tabuleiro de xadrez na interface gráfica.
@@ -87,6 +87,12 @@ namespace ChessInterface
         // Manipulador de eventos para o clique do mouse no tabuleiro.
         private void BoardGrid_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            // Verifica se o menu está visível na tela.
+            if (IsMenuOnScreen())
+            {
+                return; // Retorna se o menu estiver visível.
+            }
+
             // Obtém a posição do clique do mouse.
             Point point = e.GetPosition(BoardGrid);
             // Converte a posição do clique do mouse em uma posição do tabuleiro.
@@ -153,7 +159,14 @@ namespace ChessInterface
             gameState.MakeMove(move);
             // Redesenha o tabuleiro na interface gráfica.
             DrawBoard(gameState.Board);
+            // Define o cursor do mouse com base no jogador atual.
             SetCursor(gameState.CurrentPlayer);
+
+            // Verifica se o jogo terminou.
+            if (gameState.IsGameOver())
+            {
+                ShowGameOver();
+            }
         }
 
         // Método privado que armazena os movimentos possíveis no cache.
@@ -208,5 +221,46 @@ namespace ChessInterface
             }
         }
 
+        // Método privado que verifica se o menu está visível na tela.
+        private bool IsMenuOnScreen()
+        {
+            return MenuContainer.Content != null; // Retorna true se o menu estiver visível, caso contrário, false.
+        }
+
+        // Método privado que exibe a tela de fim de jogo.
+        private void ShowGameOver()
+        {
+            // Cria uma nova instância do menu de fim de jogo.
+            GameOverMenu gameOverMenu = new GameOverMenu(gameState);
+            // Define o conteúdo do MenuContainer como o menu de fim de jogo.
+            MenuContainer.Content = gameOverMenu;
+
+            // Adiciona um manipulador de eventos para a seleção de uma opção no menu de fim de jogo.
+            gameOverMenu.OptionSelected += option =>
+            {
+                // Verifica se a opção selecionada é reiniciar.
+                if (option == Option.Restart)
+                {
+                    // Limpa o conteúdo do MenuContainer e reinicia o jogo.
+                    MenuContainer.Content = null;
+                    RestartGame();
+                }
+                else
+                {
+                    // Encerra o aplicativo.
+                    Application.Current.Shutdown();
+                }
+            };
+        }
+
+        // Método privado que reinicia o jogo.
+        private void RestartGame()
+        {
+            HideHighlights(); // Oculta os destaques no tabuleiro.
+            moveCache.Clear(); // Limpa o cache de movimentos.
+            gameState = new GameState(Player.White, Board.Initial()); // Reinicia o estado do jogo.
+            DrawBoard(gameState.Board); // Redesenha o tabuleiro na interface gráfica.
+            SetCursor(gameState.CurrentPlayer); // Define o cursor do mouse com base no jogador atual.
+        }
     }
 }

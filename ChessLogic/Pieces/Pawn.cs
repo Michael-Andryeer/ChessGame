@@ -1,4 +1,5 @@
 ﻿// Define o namespace ChessLogic, que contém todas as classes relacionadas à lógica do jogo de xadrez
+using ChessLogic.Moves;
 using System.Security.Cryptography.X509Certificates;
 
 namespace ChessLogic
@@ -105,7 +106,7 @@ namespace ChessLogic
                     // Verifica se o peão pode mover-se duas posições para frente
                     if (!HasMoved && CanMoveTo(twoMovesPos, board))
                     {
-                        yield return new NormalMove(from, twoMovesPos);
+                        yield return new DoublePawn(from, twoMovesPos);
                     }
                 }
             }
@@ -119,9 +120,15 @@ namespace ChessLogic
             {
                 // Calcula a posição de captura diagonal
                 Position to = from + forward + dir;
+                // Verifica se a posição de destino é igual à posição de peão pulada pelo oponente
+                if (to == board.GetPawnSkipPosition(Color.Opponent()))
+                {
+                    // Se for, retorna um movimento EnPassant (captura em passagem) como uma possível jogada
+                    yield return new EnPassant(from, to);
+                }
 
                 // Verifica se o peão pode capturar na posição calculada
-                if (CanCaptureAt(to, board))
+                else if (CanCaptureAt(to, board))
                 {
                     // Verifica se a posição alcançada é uma posição de promoção
                     if (to.Row == 0 || to.Row == 7)

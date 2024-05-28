@@ -10,6 +10,13 @@ namespace ChessLogic
         // Declara um campo somente leitura de uma matriz 8x8 de peças (Piece), representando o tabuleiro de xadrez.
         private readonly Piece[,] pieces = new Piece[8, 8];
 
+        private readonly Dictionary<Player, Position> pawnSkipPositions = new Dictionary<Player, Position>
+        {
+            {Player.White,null },
+            {Player.Black,null }
+
+        };
+
         // Define um indexador para acessar e modificar as peças na matriz usando coordenadas de linha e coluna.
         public Piece this[int row, int col]
         {
@@ -26,6 +33,16 @@ namespace ChessLogic
             get { return this[pos.Row, pos.Column]; }
             // Define a peça na posição especificada por um objeto Position.
             set { this[pos.Row, pos.Column] = value; }
+        }
+
+        public Position GetPawnSkipPosition(Player player)
+        {
+            return pawnSkipPositions[player];
+        }
+
+        public void SetPawnSkipPosition(Player player,Position pos)
+        {
+            pawnSkipPositions[player] = pos;
         }
 
         // Método estático que cria e inicializa um novo tabuleiro de xadrez com as peças na posição inicial.

@@ -32,6 +32,52 @@ public class King : Piece
         Color = color;  // Inicializa a propriedade Color com o valor fornecido
     }
 
+    // Método privado que verifica se a torre na posição especificada ainda não se moveu
+    private static bool IsUnmovedRook(Position pos, Board board)
+    {
+        if (board.IsEmpty(pos))
+        {
+            return false;
+        }
+
+        Piece piece = board[pos];
+        return piece.Type == PieceType.Rook && !piece.HasMoved;
+    }
+
+    // Método privado que verifica se todas as posições especificadas estão vazias no tabuleiro
+    private static bool AllEmpty(IEnumerable<Position> positions, Board board)
+    {
+        return positions.All(pos => board.IsEmpty(pos));
+    }
+
+    // Método privado que verifica se o roque do lado do rei é possível
+    private bool CanCastleKingSide(Position from, Board board)
+    {
+        if (HasMoved)
+        {
+            return false;
+        }
+
+        Position rookPos = new Position(from.Row, 7);
+        Position[] betweenPositions = new Position[] { new(from.Row, 5), new(from.Row, 6) };
+
+        return IsUnmovedRook(rookPos, board) && AllEmpty(betweenPositions, board);
+    }
+
+    // Método privado que verifica se o roque do lado da rainha é possível
+    private bool CanCastleQueenSide(Position from, Board board)
+    {
+        if (HasMoved)
+        {
+            return false;
+        }
+
+        Position rookPos = new Position(from.Row, 0);
+        Position[] betweenPositions = new Position[] { new(from.Row, 1), new(from.Row, 3) };
+
+        return IsUnmovedRook(rookPos, board) && AllEmpty(betweenPositions, board);
+    }
+
     // Sobrescreve o método Copy da classe base para criar uma cópia da peça King
     // Retorna: uma nova instância de King com a mesma cor e estado de movimento
     public override Piece Copy()
@@ -75,6 +121,18 @@ public class King : Piece
         foreach (Position to in MovePositions(from, board))
         {
             yield return new NormalMove(from, to);
+        }
+
+        // Verifica se o roque do lado do rei é possível e adiciona-o aos movimentos possíveis
+        if (CanCastleKingSide(from, board))
+        {
+            yield return new Castle(MoveType.CastleKS, from);
+        }
+
+        // Verifica se o roque do lado da rainha é possível e adiciona-o aos movimentos possíveis
+        if (CanCastleQueenSide(from, board))
+        {
+            yield return new Castle(MoveType.CastleQS, from);
         }
     }
 

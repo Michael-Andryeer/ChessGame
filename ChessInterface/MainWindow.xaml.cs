@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq; // Usado para o método LINQ Any()
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ChessLogic; // Namespace para a lógica do jogo de xadrez
 
@@ -132,9 +130,9 @@ namespace ChessInterface
             // Se houver movimentos legais, armazena a posição e destaca os movimentos.
             if (moves.Any())
             {
-                selectedPos = pos;
-                CacheMoves(moves);
-                ShowHighlights();
+                selectedPos = pos; // Armazena a posição selecionada.
+                CacheMoves(moves); // Armazena os movimentos no cache.
+                ShowHighlights(); // Destaca as posições possíveis no tabuleiro.
             }
         }
 
@@ -148,8 +146,38 @@ namespace ChessInterface
             // Se a posição de destino estiver no cache de movimentos, executa o movimento.
             if (moveCache.TryGetValue(pos, out Move move))
             {
-                HandleMove(move);
+                // Verifica se o movimento é uma promoção de peão.
+                if (move.Type == MoveType.PawnPromotion)
+                {
+                    HandlePromotion(move.FromPos, move.ToPos); // Trata a promoção do peão.
+                }
+                else
+                {
+                    HandleMove(move); // Executa o movimento.
+                }
             }
+        }
+
+        // Método privado que trata a promoção de um peão.
+        private void HandlePromotion(Position from, Position to)
+        {
+            // Define a imagem do peão na posição de destino.
+            pieceImages[to.Row, to.Column].Source = Images.GetImage(gameState.CurrentPlayer, PieceType.Pawn);
+            // Remove a imagem do peão na posição de origem.
+            pieceImages[from.Row, from.Column].Source = null;
+
+            // Cria um novo menu de promoção.
+            PromotionMenu promMenu = new PromotionMenu(gameState.CurrentPlayer);
+            // Define o conteúdo do MenuContainer como o menu de promoção.
+            MenuContainer.Content = promMenu;
+
+            // Adiciona um manipulador de eventos para a seleção de uma peça no menu de promoção.
+            promMenu.PieceSelected += type =>
+            {
+                MenuContainer.Content = null; // Limpa o conteúdo do MenuContainer.
+                Move promMove = new PawnPromotion(from, to, type); // Cria um movimento de promoção.
+                HandleMove(promMove); // Executa o movimento de promoção.
+            };
         }
 
         // Método privado que executa um movimento.
@@ -165,7 +193,7 @@ namespace ChessInterface
             // Verifica se o jogo terminou.
             if (gameState.IsGameOver())
             {
-                ShowGameOver();
+                ShowGameOver(); // Exibe a tela de fim de jogo.
             }
         }
 

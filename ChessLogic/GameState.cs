@@ -101,6 +101,11 @@ namespace ChessLogic
                     // Senão, define o resultado como empate.
                     Result = Result.Draw(EndReason.Stelemate);
                 }
+               
+            }
+            else if (Board.InsufficientMaterial())
+            {
+                Result = Result.Draw(EndReason.InsufficienteMaterial);
             }
         }
 

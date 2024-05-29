@@ -10,11 +10,11 @@ namespace ChessLogic
         // Declara um campo somente leitura de uma matriz 8x8 de peças (Piece), representando o tabuleiro de xadrez.
         private readonly Piece[,] pieces = new Piece[8, 8];
 
+        // Declara um dicionário que armazena a posição do peão que pulou duas casas no turno anterior para cada jogador.
         private readonly Dictionary<Player, Position> pawnSkipPositions = new Dictionary<Player, Position>
         {
-            {Player.White,null },
-            {Player.Black,null }
-
+            {Player.White, null },
+            {Player.Black, null }
         };
 
         // Define um indexador para acessar e modificar as peças na matriz usando coordenadas de linha e coluna.
@@ -35,12 +35,14 @@ namespace ChessLogic
             set { this[pos.Row, pos.Column] = value; }
         }
 
+        // Método que obtém a posição do peão que pulou duas casas para um jogador específico.
         public Position GetPawnSkipPosition(Player player)
         {
             return pawnSkipPositions[player];
         }
 
-        public void SetPawnSkipPosition(Player player,Position pos)
+        // Método que define a posição do peão que pulou duas casas para um jogador específico.
+        public void SetPawnSkipPosition(Player player, Position pos)
         {
             pawnSkipPositions[player] = pos;
         }
@@ -135,7 +137,7 @@ namespace ChessLogic
         public bool IsInCheck(Player player)
         {
             // Verifica se alguma peça do oponente pode capturar o rei do jogador especificado
-            return PiecesPositionsFor(player.Opponent()).Any(pos => // Obtém todas as posições das peças do oponente e verifica se alguma pode capturar o rei do jogador
+            return PiecesPositionsFor(player.Opponent()).Any(pos =>
             {
                 // Obtém a peça na posição atual do oponente
                 Piece piece = this[pos];
@@ -162,7 +164,85 @@ namespace ChessLogic
             return copy;
         }
 
+        // Método que conta as peças no tabuleiro e retorna um objeto Counting com a contagem
+        public Counting CountPieces()
+        {
+            // Cria uma nova instância de Counting
+            Counting counting = new Counting();
+
+            // Itera sobre todas as posições ocupadas no tabuleiro
+            foreach (Position pos in PiecePositions())
+            {
+                // Obtém a peça na posição atual
+                Piece piece = this[pos];
+                // Incrementa a contagem da peça no objeto Counting
+                counting.Increment(piece.Color, piece.Type);
+            }
+
+            // Retorna o objeto Counting com a contagem das peças
+            return counting;
+        }
+
+        // Método que verifica se há material insuficiente para dar xeque-mate
+        public bool InsufficientMaterial()
+        {
+            // Conta as peças no tabuleiro
+            Counting counting = CountPieces();
+
+            // Verifica diferentes cenários de material insuficiente
+            return IsKingVKing(counting) || IsKingBishopVKing(counting) || IsKingKnightVKing(counting) || IsKingBishopVKingBishop(counting);
+        }
+
+        // Método estático que verifica se o jogo é apenas rei contra rei
+        private static bool IsKingVKing(Counting counting)
+        {
+            // Verifica se há apenas dois reis no tabuleiro
+            return counting.TotalCount == 2;
+        }
+
+        // Método estático que verifica se o jogo é rei e bispo contra rei
+        private static bool IsKingBishopVKing(Counting counting)
+        {
+            // Verifica se há apenas três peças no tabuleiro e um dos jogadores tem um bispo
+            return counting.TotalCount == 3 && (counting.White(PieceType.Bishop) == 1 || counting.Black(PieceType.Bishop) == 1);
+        }
+
+        // Método estático que verifica se o jogo é rei e cavalo contra rei
+        private static bool IsKingKnightVKing(Counting counting)
+        {
+            // Verifica se há apenas três peças no tabuleiro e um dos jogadores tem um cavalo
+            return counting.TotalCount == 3 && (counting.White(PieceType.Knight) == 1 || counting.Black(PieceType.Knight) == 1);
+        }
+
+        // Método que verifica se o jogo é rei e bispo contra rei e bispo, ambos os bispos em casas da mesma cor
+        private bool IsKingBishopVKingBishop(Counting counting)
+        {
+            // Verifica se há exatamente quatro peças no tabuleiro
+            if (counting.TotalCount != 4)
+            {
+                return false;
+            }
+
+            // Verifica se ambos os jogadores têm exatamente um bispo
+            if (counting.White(PieceType.Bishop) != 1 || counting.Black(PieceType.Bishop) != 1)
+            {
+                return false;
+            }
+
+            // Encontra a posição do bispo branco
+            Position wBishopPos = FindPiece(Player.White, PieceType.Bishop);
+            // Encontra a posição do bispo preto
+            Position BBishopPos = FindPiece(Player.Black, PieceType.Bishop);
+
+            // Verifica se ambos os bispos estão em casas da mesma cor
+            return wBishopPos.SquareColor() == BBishopPos.SquareColor();
+        }
+
+        // Método que encontra a posição de uma peça específica de um jogador específico
+        private Position FindPiece(Player color, PieceType type)
+        {
+            // Retorna a primeira posição que contém a peça especificada
+            return PiecesPositionsFor(color).First(pos => this[pos].Type == type);
+        }
     }
 }
-
-

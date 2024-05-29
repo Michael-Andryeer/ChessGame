@@ -14,7 +14,6 @@ namespace ChessLogic
         // Propriedade que representa o jogador atual. Pode ser alterada apenas dentro desta classe.
         public Player CurrentPlayer { get; private set; }
 
-        // Propriedade que representa o resultado do jogo.
         public Result Result { get; private set; } = null;
 
         // Construtor da classe GameState que inicializa o tabuleiro e o jogador atual.
@@ -39,11 +38,12 @@ namespace ChessLogic
             // Obtém a peça na posição especificada.
             Piece piece = Board[pos];
 
-            // Obtém todos os movimentos possíveis para a peça na posição atual.
+            // Obtém todos os movimentos possíveis para a peça na posição atual
             IEnumerable<Move> moveCandidates = piece.GetMoves(pos, Board);
 
-            // Filtra os movimentos candidatos para incluir apenas aqueles que são legais no tabuleiro atual.
+            // Filtra os movimentos candidatos para incluir apenas aqueles que são legais no tabuleiro atual
             return moveCandidates.Where(move => move.IsLegal(Board));
+
         }
 
         // Método que executa um movimento e altera o jogador atual para o próximo.
@@ -51,14 +51,13 @@ namespace ChessLogic
         {
             // Define a posição de peão pulada para nula antes de executar o movimento.
             Board.SetPawnSkipPosition(CurrentPlayer, null);
-
+            
             // Executa o movimento no tabuleiro.
             move.Execute(Board);
 
             // Altera o jogador atual para o próximo jogador.
             CurrentPlayer = CurrentPlayer.Opponent();
 
-            // Verifica se o jogo acabou após o movimento.
             CheckForGameOver();
         }
 
@@ -69,7 +68,6 @@ namespace ChessLogic
             // Inicializa o campo privado 'white' com o jogador branco fornecido.
             this.white = white;
         }
-
         // Método público que retorna todos os movimentos legais para todas as peças de um jogador.
         public IEnumerable<Move> AllLegalMovesFor(Player player)
         {
@@ -89,7 +87,7 @@ namespace ChessLogic
         // Método privado que verifica se o jogo acabou e define o resultado com base nas condições atuais do jogo.
         private void CheckForGameOver()
         {
-            // Verifica se não há movimentos legais para o jogador atual.
+            // Verifica se não há movimentos legais para o jogador atual e se o jogador atual está em xeque.
             if (!AllLegalMovesFor(CurrentPlayer).Any())
             {
                 // Se não houver movimentos legais para o jogador atual:
@@ -101,7 +99,7 @@ namespace ChessLogic
                 else
                 {
                     // Senão, define o resultado como empate.
-                    Result = Result.Draw(EndReason.Stalemate);
+                    Result = Result.Draw(EndReason.Stelemate);
                 }
             }
         }
@@ -109,7 +107,9 @@ namespace ChessLogic
         // Método público que verifica se o jogo acabou.
         public bool IsGameOver()
         {
-            return Result != null; // Retorna true se houver um resultado definido, caso contrário, false.
+            // Retorna verdadeiro (true) se a propriedade Result não for nula, indicando que há um resultado definido para o jogo.
+            // Caso contrário, retorna falso (false), indicando que o jogo ainda está em andamento.
+            return Result != null;
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq; // Usado para o método LINQ Any()
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using ChessLogic; // Namespace para a lógica do jogo de xadrez
+﻿using System.Collections.Generic; // Namespace para coleções genéricas.
+using System.Linq; // Usado para o método LINQ Any().
+using System.Windows; // Namespace para classes WPF básicas.
+using System.Windows.Controls; // Namespace para controles WPF.
+using System.Windows.Input; // Namespace para manipulação de entrada do usuário.
+using System.Windows.Media; // Namespace para gráficos 2D.
+using System.Windows.Shapes; // Namespace para formas gráficas.
+using ChessLogic; // Namespace para a lógica do jogo de xadrez.
 
 // Define um namespace chamado ChessInterface para organizar as classes relacionadas à interface gráfica do jogo de xadrez.
 namespace ChessInterface
@@ -284,11 +284,41 @@ namespace ChessInterface
         // Método privado que reinicia o jogo.
         private void RestartGame()
         {
+            selectedPos = null;
             HideHighlights(); // Oculta os destaques no tabuleiro.
             moveCache.Clear(); // Limpa o cache de movimentos.
             gameState = new GameState(Player.White, Board.Initial()); // Reinicia o estado do jogo.
             DrawBoard(gameState.Board); // Redesenha o tabuleiro na interface gráfica.
             SetCursor(gameState.CurrentPlayer); // Define o cursor do mouse com base no jogador atual.
+        }
+
+        // Manipulador de eventos para a tecla pressionada na janela.
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Se o menu não estiver visível e a tecla pressionada for Esc, exibe o menu de pausa.
+            if (!IsMenuOnScreen() && e.Key == Key.Escape)
+            {
+                ShowPauseMenu();
+            }
+        }
+
+        // Método privado que exibe o menu de pausa.
+        private void ShowPauseMenu()
+        {
+            PauseMenu pauseMenu = new PauseMenu(); // Cria uma nova instância do menu de pausa.
+            MenuContainer.Content = pauseMenu; // Define o conteúdo do MenuContainer como o menu de pausa.
+
+            // Adiciona um manipulador de eventos para a seleção de uma opção no menu de pausa.
+            pauseMenu.OptionSelected += option =>
+            {
+                MenuContainer.Content = null; // Limpa o conteúdo do MenuContainer.
+
+                // Se a opção selecionada for reiniciar, reinicia o jogo.
+                if (option == Option.Restart)
+                {
+                    RestartGame();
+                }
+            };
         }
     }
 }

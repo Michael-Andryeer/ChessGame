@@ -52,10 +52,13 @@ namespace ChessLogic
         }
 
         // Método sobrescrito que executa o movimento de roque no tabuleiro.
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             new NormalMove(FromPos, ToPos).Execute(board); // Executa o movimento do rei.
             new NormalMove(rookFromPos, rookToPos).Execute(board); // Executa o movimento da torre.
+
+            return false;
+        
         }
 
         // Método sobrescrito que verifica se o movimento de roque é legal.

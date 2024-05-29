@@ -26,12 +26,14 @@ namespace ChessLogic
         }
 
         // Método sobrescrito Execute que executa o movimento En Passant no tabuleiro.
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             // Executa o movimento normal da posição de origem para a posição de destino.
             new NormalMove(FromPos, ToPos).Execute(board);
             // Remove a peça capturada do tabuleiro, definindo a posição de captura como null.
             board[capturePos] = null;
+
+            return true;
         }
     }
 }

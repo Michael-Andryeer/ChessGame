@@ -15,7 +15,7 @@ namespace ChessLogic
         public abstract Position ToPos { get; }
 
         // Método abstrato que deve ser implementado nas classes derivadas para executar o movimento no tabuleiro.
-        public abstract void Execute(Board board);
+        public abstract bool Execute(Board board);
 
         // Método público e virtual que verifica se um movimento é legal em um tabuleiro fornecido
         public virtual bool IsLegal(Board board)

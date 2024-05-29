@@ -16,6 +16,8 @@ namespace ChessLogic
 
         public Result Result { get; private set; } = null;
 
+        private int noCaptureOrPawnMoves = 0;
+
         // Construtor da classe GameState que inicializa o tabuleiro e o jogador atual.
         public GameState(Board board, Player player)
         {
@@ -53,7 +55,16 @@ namespace ChessLogic
             Board.SetPawnSkipPosition(CurrentPlayer, null);
             
             // Executa o movimento no tabuleiro.
-            move.Execute(Board);
+            bool  captureOrPawn =  move.Execute(Board);
+
+            if(captureOrPawn)
+            {
+                noCaptureOrPawnMoves = 0;
+            }
+            else
+            {
+                noCaptureOrPawnMoves++;
+            }
 
             // Altera o jogador atual para o próximo jogador.
             CurrentPlayer = CurrentPlayer.Opponent();
@@ -107,6 +118,10 @@ namespace ChessLogic
             {
                 Result = Result.Draw(EndReason.InsufficienteMaterial);
             }
+            else if(FiftyMoveRule())
+            {
+                Result = Result.Draw(EndReason.FiftyMoveRule);
+            }
         }
 
         // Método público que verifica se o jogo acabou.
@@ -115,6 +130,13 @@ namespace ChessLogic
             // Retorna verdadeiro (true) se a propriedade Result não for nula, indicando que há um resultado definido para o jogo.
             // Caso contrário, retorna falso (false), indicando que o jogo ainda está em andamento.
             return Result != null;
+        }
+
+        private bool FiftyMoveRule()
+        {
+            int fullMoves = noCaptureOrPawnMoves / 2;
+
+            return fullMoves == 50;
         }
     }
 }

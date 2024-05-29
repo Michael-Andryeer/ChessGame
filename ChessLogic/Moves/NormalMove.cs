@@ -22,10 +22,12 @@ namespace ChessLogic
         }
 
         // Método sobrescrito que executa o movimento no tabuleiro.
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             // Obtém a peça na posição de origem no tabuleiro.
             Piece piece = board[FromPos];
+
+            bool capture = !board.IsEmpty(ToPos); 
 
             // Coloca a peça na posição de destino no tabuleiro.
             board[ToPos] = piece;
@@ -35,6 +37,8 @@ namespace ChessLogic
 
             // Marca a peça como tendo se movido.
             piece.HasMoved = true;
+
+            return capture || piece.Type == PieceType.Pawn;
         }
     }
 }

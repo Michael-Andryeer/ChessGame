@@ -39,7 +39,7 @@ namespace ChessLogic
         }
 
         // Sobrescreve o método Execute para executar o movimento de promoção no tabuleiro.
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             // Obtém o peão na posição inicial.
             Piece pawn = board[FromPos];
@@ -52,6 +52,8 @@ namespace ChessLogic
             promotionPiece.HasMoved = true;
             // Coloca a peça de promoção na posição final.
             board[ToPos] = promotionPiece;
+
+            return true;
         }
     }
 }

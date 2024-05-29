@@ -26,7 +26,7 @@ namespace ChessLogic.Moves
         }
 
         // Método sobrescrito Execute que executa o movimento de peão duplo no tabuleiro.
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             // Obtém a cor do jogador a partir da peça na posição de origem.
             Player player = board[FromPos].Color;
@@ -34,6 +34,8 @@ namespace ChessLogic.Moves
             board.SetPawnSkipPosition(player, skippedPos);
             // Executa o movimento normal da posição de origem para a posição de destino.
             new NormalMove(FromPos, ToPos).Execute(board);
+
+            return true;
         }
     }
 }

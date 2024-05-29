@@ -1,5 +1,6 @@
 ﻿// Importa o namespace ChessLogic.Pieces que provavelmente contém as classes das peças de xadrez (Rook, Knight, Bishop, etc.).
 using ChessLogic.Pieces;
+using System.Security.Cryptography.X509Certificates;
 
 // Define um namespace chamado ChessLogic para organizar as classes relacionadas à lógica do jogo de xadrez.
 namespace ChessLogic
@@ -244,5 +245,103 @@ namespace ChessLogic
             // Retorna a primeira posição que contém a peça especificada
             return PiecesPositionsFor(color).First(pos => this[pos].Type == type);
         }
+
+        // Método privado que verifica se o rei e a torre em posições específicas não se moveram.
+        private bool IsUnmovedKingAndRook(Position kingPos, Position rookPos)
+        {
+            // Verifica se a posição do rei ou da torre está vazia.
+            if (IsEmpty(kingPos) || IsEmpty(rookPos))
+            {
+                return false; // Retorna falso se qualquer posição estiver vazia.
+            }
+
+            // Obtém a peça na posição do rei e na posição da torre.
+            Piece king = this[kingPos];
+            Piece rook = this[rookPos];
+
+            // Retorna verdadeiro se a peça na posição do rei for um rei, a peça na posição da torre for uma torre,
+            // e ambas as peças não tiverem se movido ainda.
+            return king.Type == PieceType.King && rook.Type == PieceType.Rook &&
+                   !king.HasMoved && !rook.HasMoved;
+        }
+
+        // Método público que verifica o direito de roque do lado do rei (curto) para um jogador.
+        public bool CastleRightKS(Player player)
+        {
+            // Usa uma expressão switch para verificar se o jogador tem o direito de roque curto,
+            // com base nas posições iniciais do rei e da torre para branco e preto.
+            return player switch
+            {
+                Player.White => IsUnmovedKingAndRook(new Position(7, 4), new Position(7, 7)),
+                Player.Black => IsUnmovedKingAndRook(new Position(0, 4), new Position(0, 7)),
+                _ => false // Retorna falso para qualquer outro valor de jogador (inválido).
+            };
+        }
+
+        // Método privado que verifica se um peão está em uma das posições específicas e pode capturar en passant.
+        private bool HasPawnInPosition(Player player, Position[] pawnPositions, Position skipPos)
+        {
+            // Itera sobre as posições dos peões fornecidas que estão dentro dos limites do tabuleiro.
+            foreach (Position pos in pawnPositions.Where(IsInside))
+            {
+                // Obtém a peça na posição atual.
+                Piece piece = this[pos];
+                // Continua para a próxima posição se a peça for nula, não pertencer ao jogador, ou não for um peão.
+                if (piece == null || piece.Color != player || piece.Type != PieceType.Pawn)
+                {
+                    continue;
+                }
+
+                // Cria um movimento en passant com a posição do peão e a posição do peão que pulou duas casas.
+                EnPassant move = new EnPassant(pos, skipPos);
+
+                // Retorna verdadeiro se o movimento en passant for legal.
+                if (move.IsLegal(this))
+                {
+                    return true;
+                }
+            }
+
+            // Retorna falso se nenhum peão puder capturar en passant.
+            return false;
+        }
+
+        // Método público que verifica o direito de roque do lado da dama (longo) para um jogador.
+        public bool CastleRightQS(Player player)
+        {
+            // Usa uma expressão switch para verificar se o jogador tem o direito de roque longo,
+            // com base nas posições iniciais do rei e da torre para branco e preto.
+            return player switch
+            {
+                Player.White => IsUnmovedKingAndRook(new Position(7, 4), new Position(7, 0)),
+                Player.Black => IsUnmovedKingAndRook(new Position(0, 4), new Position(0, 0)),
+                _ => false // Retorna falso para qualquer outro valor de jogador (inválido).
+            };
+        }
+
+        // Método público que verifica se um jogador pode capturar en passant.
+        public bool CanCaptureEnPassant(Player player)
+        {
+            // Obtém a posição do peão que pulou duas casas no último movimento do oponente.
+            Position skipPos = GetPawnSkipPosition(player.Opponent());
+
+            // Retorna falso se não houver peão que pulou duas casas.
+            if (skipPos == null)
+            {
+                return false;
+            }
+
+            // Determina as posições potenciais dos peões que podem capturar en passant com base no jogador.
+            Position[] pawnPositions = player switch
+            {
+                Player.White => new Position[] { skipPos + Direction.SouthWest, skipPos + Direction.SouthEast },
+                Player.Black => new Position[] { skipPos + Direction.NorthEast, skipPos + Direction.NorthWest },
+                _ => Array.Empty<Position>() // Retorna um array vazio para qualquer outro valor de jogador (inválido).
+            };
+
+            // Verifica se há um peão na posição que pode capturar en passant.
+            return HasPawnInPosition(player, pawnPositions, skipPos);
+        }
+
     }
 }
